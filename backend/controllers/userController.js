@@ -34,7 +34,8 @@ const registerUser = asyncHandler(async (req,res) => {
         name,
         email,
         password: hashedPassword,
-        role
+        role,
+        alreadyPlayed:false
     })
 
     if(user){
@@ -68,6 +69,7 @@ const loginUser = asyncHandler(async (req,res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            alreadyPlayed:user.alreadyPlayed,
             token : generateToken(user._id)
          })
     }else{
@@ -100,6 +102,39 @@ const getUsers = asyncHandler(async (req,res) => {
     
 })
 
+
+//@desc Update user
+//@route PUT /api/users
+//@access Private
+const updateUser =  asyncHandler(  async (req,res) =>{
+    const user = await User.findById(req.user.id)
+    
+    if(!user){
+        res.status(400)
+      throw new Error('a user with this id doesn\'t exist')
+    }
+    //Make sur the logged in user is an admin
+    if(user.role !== "User"){
+        res.status(301)
+        throw new Error('User not authorized')
+    }
+
+    console.log(req.body);
+    userToUpdate ={
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        note:req.body.note,
+        quizz: req.body.quizz,
+        alreadyPlayed:true
+
+     }
+
+    const updatedUser = await User.findByIdAndUpdate(user.id,userToUpdate,{new:true})
+    res.json(updateUser)
+})
+
+
 // Generate JWT
 const generateToken = (id) =>{
     
@@ -110,5 +145,6 @@ const generateToken = (id) =>{
 module.exports = {
     registerUser,
     loginUser,
-    getUsers
+    getUsers,
+    updateUser
 }

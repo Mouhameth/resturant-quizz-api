@@ -17,14 +17,19 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'enter the role']
     },
+    alreadyPlayed: {
+        type: Boolean,
+        required: [true, 'enter the role']
+    },
     note: {
         type: Number
     },
     quizz: [{
         question: String,
         reponses: [{
-            reponse:String
-        }]
+            reponse:String,
+            genre:String
+        },]
     }]
 }, { timetamps: true })
 
